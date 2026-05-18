@@ -1,0 +1,12 @@
+alias gfp="git fetch -p"
+alias gpp="git pull -p"
+alias gp="git push"
+alias gpuo="git push -u origin"
+alias gpu='git push -u origin HEAD'
+alias gbr='git branch -r'
+alias gb='git branch'
+alias gbvv='git branch -vv'
+alias gs='git stash'
+alias gsp='git stash pop'
+alias gr='git restore .'
+alias gst='git status'
