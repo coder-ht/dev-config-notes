@@ -16,3 +16,8 @@
 - ghy 环境规则文件是 `codex/envs/ghy/rules.md`，通用规则文件是 `codex/general/rules.md`。
 - `/home/ghy/.codex` 不是 `dev-config-notes` 仓库的一部分，本机配置修改无法随仓库 git 提交。
 
+## 2026-07-09 ghy 本机规则备份范围
+
+- 场景：用户要求把当前本机 Codex 规则备份到 `dev-config-notes` 仓库。
+- 做法：`/home/ghy/.codex/AGENTS.md` 备份到 `codex/AGENTS.md`；ghy 机器专属的规则、经验和说明类 Markdown 备份到 `codex/envs/ghy/`。
+- 注意：只备份 Markdown 规则资料；排除 `auth.json`、`config.toml`、sqlite、日志、history、缓存、shell 快照等运行态文件，并把请求头写成 `<Authorization>` 占位符。
