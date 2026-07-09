@@ -19,3 +19,12 @@
 - 调试任何平台接口、Cube2 后台接口、AI 调用接口、AI Flow、工作流接口、字典接口或模拟上报接口前，先读取 `/home/ghy/.codex/AI_INTERFACE_CALL_CASES.md`。
 - 严格复用其中的调用步骤、Header 规则、请求体规则、响应包装层路径和业务结果字段路径。
 - 接口调试凭据、Bearer、账号密码、API Key 不应写入本仓库规则文件；需要时使用本机私有配置或用户当次提供的请求头。
+
+## zsh Git 别名同步
+
+- ghy 本机 zsh 生效配置是 `/home/ghy/.zshrc`，规则仓库中的 Git 别名备份文件是 `/home/ghy/work/dev-config-notes/git/git-fast-options`。
+- 备份本机 zsh Git 别名到仓库时，必须先比较 `/home/ghy/.zshrc` 中的 Git alias 区块和 `git/git-fast-options`，只把可迁移的 Git alias 写入仓库文件。
+- 同步仓库 Git 别名到本机时，优先让 `/home/ghy/.zshrc` 通过 `source /home/ghy/work/dev-config-notes/git/git-fast-options` 加载仓库文件，避免在 `.zshrc` 与仓库文件中长期维护两份重复 alias。
+- 若因启动顺序、兼容性或临时排查必须保留 `.zshrc` 内手写 Git alias，需要在执行后说明原因，并明确仓库文件与 `.zshrc` 是否仍存在差异。
+- 同步或备份后必须验证别名是否生效，优先使用 `zsh -ic 'alias gfp gpp gp gpu gst'` 或等价命令检查关键别名。
+- 不要把非 Git alias、个人路径启动命令、临时调试 alias、敏感参数或运行日志写入 `git/git-fast-options`。

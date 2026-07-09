@@ -21,3 +21,9 @@
 - 场景：用户要求把当前本机 Codex 规则备份到 `dev-config-notes` 仓库。
 - 做法：`/home/ghy/.codex/AGENTS.md` 备份到 `codex/AGENTS.md`；ghy 机器专属的规则、经验和说明类 Markdown 备份到 `codex/envs/ghy/`。
 - 注意：只备份 Markdown 规则资料；排除 `auth.json`、`config.toml`、sqlite、日志、history、缓存、shell 快照等运行态文件，并把请求头写成 `<Authorization>` 占位符。
+
+## 2026-07-09 ghy zsh Git 别名同步
+
+- 场景：用户要求把 zsh Git 别名同步规则写入规则。
+- 做法：ghy 本机 `.zshrc` 是 `/home/ghy/.zshrc`，仓库备份文件是 `git/git-fast-options`；同步时优先让 `.zshrc` source 仓库文件，备份时先比较两边差异再更新仓库 alias。
+- 注意：当前 `.zshrc` 中 Git alias 比 `git/git-fast-options` 更多，后续真实同步/备份时需要先对齐差异，再用 `zsh -ic 'alias gfp gpp gp gpu gst'` 验证关键别名。
