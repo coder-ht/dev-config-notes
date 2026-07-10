@@ -14,6 +14,7 @@
 - 做法：`AGENTS.md` 只保留环境路由逻辑，具体规则拆到 `codex/general/` 与 `codex/envs/<env>/`。
 - 复用：任务开始时先读取 `CODEX_WORK_ENV`，始终加载通用规则/经验，再按环境加载对应规则/经验。
 - 注意：写入经验前必须判断归属，通用经验写入 `codex/general/experience.md`，环境专属经验写入对应环境目录。
+- 约定：入口 `AGENTS.md` 必须直接读取当前环境 `dev-config-notes` 项目中的规则文件，不读取本机 `~/.codex/codex/` 副本。
 
 ## 2026-07-09 Codex 规则同步与备份术语
 
