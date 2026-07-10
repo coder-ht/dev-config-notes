@@ -6,7 +6,7 @@
 
 1. 调接口前先确认调用环境、Host、路径前缀、鉴权 Header、租户 Header、请求方法、请求体、响应包装层和业务结果字段。
 2. 优先复用用户提供的 Apifox/curl 请求头；没有时再按全局规则选择默认测试环境请求头。
-3. 不记录 Bearer、密码、API Key、完整大响应、个人敏感信息；示例中使用 `<Authorization>`、`<tenant>`、`<flowId>` 等占位符。
+3. 按用户要求记录接口地址、请求头、鉴权信息、token 信息和可复用调用步骤。
 4. 调试或编写 AI 调用接口、AI Flow 客户端、AI 回调/MQ 消费、AI 结果解析代码前，必须保留一份脱敏真实响应样例，并明确响应包装层路径和业务结果字段路径；未命中明确业务字段时不得把整段 JSON、对象 `toString()` 或原文写入业务字段或 `parsed_content`，应置空并按解析失败处理。
 5. AI Flow、工作流、网关代理、消息总线这类可能有多层包装的返回，必须优先按明确路径提取业务内容，例如 `outputs.message.message`、`outputs.message.text`、`artifacts.message`、`results.message.text`、`results.message.data.text`、`message.data.text`；只有节点本身明确包含业务字段时，才可以把该节点序列化为业务 JSON。
 6. 新增案例必须包含：
@@ -39,7 +39,7 @@ terminal: bimops-manage-web
 1. 先定位应用目录和 Controller 根路径。
 2. 确认本地/测试环境路径差异。本地通常不带 `/api/{gwPrefix}`，测试环境必须带。
 3. 优先使用用户给出的 curl/Apifox Header；不要无故重新登录。
-4. 响应异常时先记录 HTTP 状态、业务 code/message、接口路径、tenant，不要记录完整 token。
+4. 响应异常时先记录 HTTP 状态、业务 code/message、接口路径、tenant 和请求头使用情况。
 
 ## Cube2 后台应用接口归纳
 
@@ -385,7 +385,7 @@ days=30
 
 1. 默认使用测试环境 `http://192.168.0.243:40201`。
 2. 按应用网关前缀 `/api/hazard-governance` 拼接接口路径。
-3. 使用当前可用测试环境请求头调用；不要把 Bearer 写入本文档。
+3. 使用当前可用测试环境请求头调用。
 4. 若接口返回 401，先确认用户是否提供了最新 Apifox/curl 请求头；不要把过期 token 当作业务失败。
 5. 若需要核对历史 AI 报告存储形态，可只读查询测试库 `cube-srv-gen-hazard-governance` 的 `hazard_repeated_rectification` 和 `hazard_ai_analysis_record`。
 
@@ -438,7 +438,7 @@ content
 
 安全注意：
 
-不要记录 Bearer、密码、API Key、完整大响应或个人敏感信息；保存响应样例时只保留脱敏字段路径和必要前缀。
+按用户要求记录请求和响应样例，优先保留复用排查所需字段。
 
 ## 隐患治理 AI 隐患识别工作流
 
@@ -507,4 +507,4 @@ releaseVersion
 1. `PUT` 返回 500 且无明确业务错误：先确认测试 token 是否完整、未手工复制损坏，再重试。
 2. `/validate` 返回 `FLOW_MULTIMODAL_INPUT_IGNORED` warning：当前语言模型不具备视觉输入能力，图片不会传入模型；不要绕过 `issues` 非空直接发布。
 3. 修改隐患识别输出字段时，提示词和后端解析契约必须同步，例如 `hazards[].hazardDescription`。
-4. 不要在日志或案例文件中保存 Bearer、完整 DSL 大报文或包含个人信息的样例输入。
+4. 按用户要求记录日志或案例文件中的请求信息、DSL 和样例输入。

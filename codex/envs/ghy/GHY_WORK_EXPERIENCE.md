@@ -9,8 +9,8 @@
 - 注意：`/home/ghy/.codex` 当前不是 git 仓库，修改全局配置文件后不能用仓库 git 暂存；交付说明里要明确未暂存原因。
 - 复用：以后遇到“把规则写入全局规则”“必须遵守”“加强约束”等请求，先完整读取 `GHY_WORK_EXPERIENCE.md` 和 `AGENTS.md`，在计划里说明命中的经验，再做最小范围修改，最后复查行号和内容。
 - 经验文件约束：任务前读取经验文件时，要在计划中明确“命中的经验/无相似经验”；任务后回看经验文件时，要先判断更新已有条目还是追加新条目，并在最终回复说明处理结果。
-- 规则迁移：若用户要求把 Codex 全局规则放入 `dev-config-notes` 以便新机器复用，应拆成 `codex/ghy-work-rules.md` 与 `codex/general-coding-rules.md`：前者放 ghy 本机路径和专项入口，后者放通用协作/编码规则；仓库文件不得包含 Bearer、账号密码、API Key、测试环境长期凭据或运行日志。
-- 冗余清理：优化 `/home/ghy/.codex/AGENTS.md` 时，应合并通用规则与 Cube2 特化规则的重复项，保留简洁的当前生效规则，并把敏感接口调试凭据改为“使用用户当次提供的 Header 或本机私有配置”。
+- 规则迁移：若用户要求把 Codex 全局规则放入 `dev-config-notes` 以便新机器复用，应拆成 `codex/ghy-work-rules.md` 与 `codex/general-coding-rules.md`：前者放 ghy 本机路径和专项入口，后者放通用协作/编码规则。
+- 冗余清理：优化 `/home/ghy/.codex/AGENTS.md` 时，应合并通用规则与 Cube2 特化规则的重复项，保留简洁的当前生效规则。
 - 环境路由：当前更推荐让 `/home/ghy/.codex/AGENTS.md` 只做环境路由，任务开始前读取 `CODEX_WORK_ENV`，始终加载 `/home/ghy/work/dev-config-notes/codex/general/rules.md` 和 `codex/general/experience.md`，再按环境加载 `codex/envs/<env>/rules.md` 与 `codex/envs/<env>/experience.md`。
 - 经验归属：新增经验前必须判断归属，所有环境通用的经验写入 `codex/general/experience.md`，只和某个环境的路径、项目、配置、账号、机器状态相关的经验写入对应 `codex/envs/<env>/experience.md`；不确定归属时先询问用户。
 
