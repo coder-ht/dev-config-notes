@@ -77,3 +77,9 @@
 - 做法：从 GitHub latest release 下载 `linux_x86_64` tarball，使用 `checksums.txt` 校验后安装到 `/home/hetao/.local/bin/lazygit`。
 - 注意：`~/.local/bin` 已在 PATH 中；安装后用 `command -v lazygit` 和 `lazygit --version` 验证。
 
+## 2026-07-13 home Windows WezTerm 配置优化
+
+- 场景：优化 `C:\Users\29900\.wezterm.lua` 时需要保留已验证的默认 WSL 和 tmux 风格快捷键。
+- 做法：保留 `config.default_domain = 'WSL:Debian12'`，补充窗口尺寸、标签栏、标题格式、自定义配色、滚动、复制粘贴、全屏、重载配置和 launcher 快捷键。
+- 注意：修改后用 `wezterm.exe show-keys --lua` 验证配置可加载；不要依赖本机未安装的额外字体或外部主题文件。
+
