@@ -95,3 +95,9 @@
 - 做法：`format-tab-title` 和 `format-window-title` 优先读取 `tab.tab_title`，为空时回退到 `tab.active_pane.title`。
 - 注意：`tab:set_title()` 设置的是 tab 标题，不应只读取 active pane 标题；修改后用 `wezterm.exe show-keys --lua` 验证配置可加载。
 
+## 2026-07-13 home Windows WezTerm 恢复默认配色
+
+- 场景：用户要求撤销 Windows WezTerm 的自定义配色。
+- 做法：删除 `C:\Users\29900\.wezterm.lua` 中的 `config.colors`，让 WezTerm 回到默认配色；保留标题、快捷键、WSL 和 workspace 设置。
+- 注意：仓库历史没有旧的自定义配色备份；无法恢复到未知的旧主题时，应先确认是否接受默认配色。
+
