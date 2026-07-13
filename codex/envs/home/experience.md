@@ -83,3 +83,15 @@
 - 做法：保留 `config.default_domain = 'WSL:Debian12'`，补充窗口尺寸、标签栏、标题格式、自定义配色、滚动、复制粘贴、全屏、重载配置和 launcher 快捷键。
 - 注意：修改后用 `wezterm.exe show-keys --lua` 验证配置可加载；不要依赖本机未安装的额外字体或外部主题文件。
 
+## 2026-07-13 home Windows WezTerm workspace 恢复
+
+- 场景：按仓库 `wezterm/` 配置给 home 的 Windows WezTerm 增加 workspace 保存/恢复能力。
+- 做法：home 保留 `config.default_domain = 'WSL:Debian12'`，不要照搬 ghy/Linux 的 `default_prog = { '/bin/zsh', '-l' }`；增加 `Alt+t` 重命名 tab、`Alt+s` 保存 workspace、`Alt+r` 恢复 workspace。
+- 注意：`resurrect.wezterm` 插件网络安装失败时，应使用条件加载检测 `plugins/resurrect.wezterm/plugin/resurrect/workspace_state.lua`，保证插件缺失时 WezTerm 仍可启动，并用 `wezterm.exe show-keys --lua` 验证。
+
+## 2026-07-13 home Windows WezTerm 自定义标题显示
+
+- 场景：`Alt+t` 设置 tab 标题后，窗口标题和 tab 显示仍使用 pane 标题。
+- 做法：`format-tab-title` 和 `format-window-title` 优先读取 `tab.tab_title`，为空时回退到 `tab.active_pane.title`。
+- 注意：`tab:set_title()` 设置的是 tab 标题，不应只读取 active pane 标题；修改后用 `wezterm.exe show-keys --lua` 验证配置可加载。
+
