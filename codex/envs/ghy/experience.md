@@ -27,24 +27,6 @@
 - 做法：ghy 本机 `.zshrc` 是 `/home/ghy/.zshrc`，仓库备份文件是 `git/git-fast-options`；同步时优先让 `.zshrc` source 仓库文件，备份时先比较两边差异再更新仓库 alias。
 - 注意：当前 `.zshrc` 中 Git alias 比 `git/git-fast-options` 更多，后续真实同步/备份时需要先对齐差异，再用 `zsh -ic 'alias gfp gpp gp gpu gst'` 验证关键别名。
 
-## 2026-07-09 emergency-management-migrate 预案生成页面边距
-
-- 场景：`/home/ghy/work/ghcloud/legacy/emergency-management-migrate` 的 `planGenerate` 页面在主应用内出现顶部和左侧内容区空白。
-- 做法：先查路由与子应用根布局；该路由直连 `src/views/planGenerate/index.vue`，主要页面外侧空白来自本页 `.plan-generate-page` 的内边距，不是共享 `g-layout`。
-- 注意：只去除页面根容器外侧 padding，保留面板内部 padding 和 grid gap，避免破坏表单、预览卡片的内部层次。
-
-## 2026-07-09 emergency-management-migrate 预案生成返回白屏
-
-- 场景：`planGenerate` 页面返回按钮在 qiankun 主应用内点击后白屏。
-- 做法：不要用 `window.history.length` 判断后执行 `router.back()`；浏览器历史可能落到主应用或未匹配地址，固定 `router.push("/planDocument/list")` 更稳。
-- 注意：保存成功跳转本来就是固定回列表，可保持一致。
-
-## 2026-07-09 Cube2 测试环境管理端菜单禁用
-
-- 场景：需要通过接口禁用测试环境管理端菜单，例如“预案生成”菜单。
-- 做法：测试环境管理端访问地址是 `http://192.168.0.243:30101`；登录页前端通过 `/api/ouaa/public/auth/login/code/generate` 获取验证码，通过 `/gw-bff/auth/token` 登录，Header 需要 `x-oauth-client: inner_terminal`，登录后用 `tenant: 0`、`terminal: kh-admin-web` 调 `/api/ouaa/menu/{id}`。
-- 注意：菜单更新接口要求完整保留 `code/name/icon/path/sort/remark/categoryId` 等字段，只修改 `enabled`；不要写入账号密码、Bearer token 或验证码图片。
-
 ## 2026-07-10 baseline 前端版本升级最小流程
 
 - 场景：升级 `/home/ghy/work/baseline/component/fe.yaml` 中某个前端应用的部署版本。
@@ -123,18 +105,6 @@
 - 场景：ghy 本机 GNOME 桌面需要设置自定义速查表壁纸，系统没有 `convert` 或 `rsvg-convert`。
 - 做法：可直接生成 SVG 到 `/home/ghy/Pictures/wallpapers/`，再用 `gsettings set org.gnome.desktop.background picture-uri 'file://...'` 和 `picture-uri-dark` 设置亮色/暗色壁纸。
 - 注意：双屏横向当前可按 `xdpyinfo` 的 `3840x1080` 生成宽幅 SVG，并设置 `picture-options 'zoom'` 后用 `gsettings get` 验证；若壁纸视觉过大，优先缩小 SVG 内部内容区和字号、增加外侧留白，不必改 GNOME 路径。
-
-## 2026-07-10 隐患治理根因分析已关闭测试造数
-
-- 场景：需要在 Cube2 测试环境为隐患治理根因分析增加“已关闭”列表数据。
-- 做法：`CLOSED` 不是落库状态，而是已有 `hazard_repeated_rectification` 案件在查询窗口内同一风险对象与分类的已闭环隐患少于 3 条时实时派生；造数应使用新组合，并同步新增历史 `hazard_record`、案件和证据快照。
-- 注意：历史闭环时间应早于前端最大查询窗口，写入后核对 30/90/180 天计数、案件与证据数量；测试库工具禁用物理删除时，回滚使用本次唯一 ID 做逻辑删除。接口验证仍需当前有效 Bearer，不能从历史记录中提取或持久化凭据。
-
-## 2026-07-10 隐患治理根因分析正式库安全补录
-
-- 场景：正式库需要补录隐患治理根因分析“已关闭”展示数据。
-- 做法：业务展示文本可以贴近真实运维场景，但审计字段必须保留补录痕迹；验收展示名使用岗位类名称，例如“隐患验收岗”，不要伪造真实人员姓名。
-- 注意：正式库执行中断后先按本次唯一 ID 复核 `hazard_record`、案件表、证据表数量，再补齐缺失表；验收必须覆盖数量、关联完整性、验收人字段和 30/90/180 天派生关闭状态。
 
 ## 2026-07-10 ghy Codex 新增 MCP 生效边界
 
