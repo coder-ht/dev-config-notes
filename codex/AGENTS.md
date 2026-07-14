@@ -5,6 +5,16 @@
 - `CODEX_WORK_ENV=ghy`：仓库根路径为 `/home/ghy/work/dev-config-notes`
 - `CODEX_WORK_ENV=home`：仓库根路径为 `/home/hetao/workspace/dev-config-notes`
 
+项目级规则与经验：
+
+- 当前工作目录位于下列项目根目录或其子目录时，只读取对应项目的规则和经验：
+  - `/home/ghy/work/cube2-upgrade` 或 `/home/hetao/workspace/cube2-upgrade` → `codex/projects/cube2/`
+  - `/home/ghy/work/ghcloud` 或 `/home/hetao/workspace/ghcloud` → `codex/projects/ghcloud/`
+  - `/home/ghy/work/kaihe` 或 `/home/hetao/workspace/kaihe` → `codex/projects/kaihe/`
+  - `/home/ghy/work/kaiyun-oa` 或 `/home/hetao/workspace/kaiyun-oa` → `codex/projects/kaiyun-oa/`
+- 项目匹配按完整项目根路径判断，不根据当前子目录名称猜测项目；未匹配项目时不加载任何项目级文件。
+- 项目级文件适用于 `ghy` 和 `home` 两个环境，不改变 `CODEX_WORK_ENV` 的环境选择逻辑。
+
 ## 任务开始前
 
 每次执行用户任务前，必须先读取当前系统环境变量 `CODEX_WORK_ENV`，然后按以下顺序加载规则与经验：
@@ -16,6 +26,7 @@
 5. 根据 `CODEX_WORK_ENV` 读取对应环境文件：
    - `CODEX_WORK_ENV=ghy`：读取 `<当前环境 dev-config-notes 仓库>/codex/envs/ghy/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/envs/ghy/experience.md`
    - `CODEX_WORK_ENV=home`：读取 `<当前环境 dev-config-notes 仓库>/codex/envs/home/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/envs/home/experience.md`
+6. 若当前工作目录位于上述某个项目根目录或其子目录，再读取该项目对应的 `<当前环境 dev-config-notes 仓库>/codex/projects/<project>/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/projects/<project>/experience.md`；只加载匹配到的一个项目。
 
 配置示例：`export CODEX_WORK_ENV=ghy` 或 `export CODEX_WORK_ENV=home`。
 
