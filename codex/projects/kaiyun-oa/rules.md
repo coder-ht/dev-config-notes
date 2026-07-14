@@ -9,6 +9,25 @@
 - 测试部署配置：`deploy/test`
 - 后端是 Maven 多模块项目，Spring Boot 启动模块为 `kaiyun-be/application`，主类为 `com.base.Application`。
 
+## 技能与目录归属
+
+- 通用工作区技能放在项目根目录 `skills/` 下；前端专属技能放在 `kaiyun-fe/skills/` 下。
+- 适用于前后端的技能放在项目根目录，不放入前端专属目录。
+- 技能目录按技能类型划分，不混放无关技能。
+
+## 考勤业务约束
+
+- 考勤打卡的前提是员工已绑定手机号。
+- 不支持未绑定手机号的人员登录或打卡。
+- 打卡流程不设计“非绑定手机号打卡理由”“非绑定手机号异常分类”或相关审批处理。
+
+## Java 集合工具
+
+- 后端处理 `List`、`Collection`、`Set`、`Map` 时，优先复用 `com.base.common.utils.ListUtils`、`MapUtils`、`SetUtils`。
+- 集合判空优先使用 `ListUtils.isEmpty/isNotEmpty`；Map 判空优先使用 `MapUtils.isEmpty/isNotEmpty`。
+- 集合映射、转 Map、分组和计数优先使用现有工具方法，避免重复编写 stream 或判空逻辑。
+- 保留现有工具对 null 过滤、重复 key 和映射结果的行为；只有通用工具无法表达时才直接使用 stream。
+
 ## 服务器与部署边界
 
 - 通过 SSH 连接服务器时，项目路径为 `/root/docker/server/kaiyun`。

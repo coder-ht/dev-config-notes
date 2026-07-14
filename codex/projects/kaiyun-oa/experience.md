@@ -1,5 +1,11 @@
 # Kaiyun OA 项目经验总结
 
+## 2026-07-13 测试环境服务器构建部署
+
+- 场景：Kaiyun 测试环境改为服务器本机打包 JAR 和构建 Docker 镜像。
+- 做法：服务器项目位于 `/root/docker/server/kaiyun/repo/test`，使用 JDK 21、Maven 3.8.7、Docker Compose 5；镜像按 commit SHA 标记，部署日志放在 `/root/docker/server/kaiyun/test/logs/deploy/` 且只保留最新一份。
+- 注意：固定容器名切换 Compose project 时，必须在镜像构建成功后移除旧容器再启动；服务器磁盘剩余约 10GB，部署前后应检查空间。经验中不记录服务器凭据。
+
 ## 2026-07-14 测试环境部署与版本自动升级
 
 - 场景：测试环境前后端共用服务器部署脚本，且 `test` 分支由 GitHub Actions 自动升级模块版本。
