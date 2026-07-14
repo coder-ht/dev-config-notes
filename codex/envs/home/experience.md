@@ -101,3 +101,15 @@
 - 做法：删除 `C:\Users\29900\.wezterm.lua` 中的 `config.colors`，让 WezTerm 回到默认配色；保留标题、快捷键、WSL 和 workspace 设置。
 - 注意：仓库历史没有旧的自定义配色备份；无法恢复到未知的旧主题时，应先确认是否接受默认配色。
 
+## 2026-07-13 Kaiyun 测试环境服务器构建部署
+
+- 场景：Kaiyun 测试环境改为服务器本机打包 JAR 和构建 Docker 镜像。
+- 做法：服务器项目位于 `/root/docker/server/kaiyun/repo/test`，使用 JDK 21、Maven 3.8.7、Docker Compose 5；镜像按 commit SHA 标记，部署日志放在 `/root/docker/server/kaiyun/test/logs/deploy/` 且只保留最新一份。
+- 注意：固定容器名切换 Compose project 时，必须在镜像构建成功后移除旧容器再启动；服务器磁盘剩余约 10GB，部署前后应检查空间。经验中不记录服务器凭据。
+
+## 2026-07-14 Kaiyun 项目规则归档
+
+- 场景：将 Kaiyun 项目中的入口、模块约束和集合工具规范迁移到规则仓库。
+- 做法：项目路径、服务器边界、技能归属、考勤约束和集合工具规范统一归档到 `codex/envs/home/KAIYUN_RULES.md`；已有测试部署经验继续保留在本环境经验文件。
+- 注意：项目源码、构建产物和依赖目录不作为规则或经验迁移内容；远程部署规则仍以用户明确授权为前提。
+
