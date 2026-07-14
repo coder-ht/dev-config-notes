@@ -6,11 +6,11 @@
 
 - Codex 必须配置并读取环境变量 `CODEX_WORK_ENV` 后才能正常执行任务。
 - `CODEX_WORK_ENV` 用于判断当前运行环境，并决定需要加载哪些环境规则和环境经验文件。
-- 当前支持的环境值包括 `ghy` 和 `home`。
+- 当前支持的环境值包括 `ghy`、`home-windows` 和 `home-wsl`。
 - 每次执行用户任务前，必须先读取 `CODEX_WORK_ENV`。
 - 若 `CODEX_WORK_ENV` 为空、缺失或不是已支持的环境值，必须停止执行具体任务，先提示用户配置环境变量。
 - 环境变量缺失时，只允许说明需要配置什么，不允许继续执行代码修改、接口调试、规则同步、规则备份、提交或推送等实际操作。
-- 配置示例：`export CODEX_WORK_ENV=ghy` 或 `export CODEX_WORK_ENV=home`。
+- 配置示例：`export CODEX_WORK_ENV=ghy`、`export CODEX_WORK_ENV=home-windows` 或 `export CODEX_WORK_ENV=home-wsl`。
 - 只有确认 `CODEX_WORK_ENV` 有效后，才能继续读取通用规则、通用经验、对应环境规则和对应环境经验。
 
 ## Subagent 协作
