@@ -24,11 +24,12 @@
 2. 只有确认 `CODEX_WORK_ENV` 有效后，才能确定当前环境的 `dev-config-notes` 仓库根路径。
 3. 读取通用规则：`<当前环境 dev-config-notes 仓库>/codex/general/rules.md`
 4. 读取通用经验：`<当前环境 dev-config-notes 仓库>/codex/general/experience.md`
-5. 根据 `CODEX_WORK_ENV` 读取对应环境文件：
+5. 读取用户技术熟悉度档案：`<当前环境 dev-config-notes 仓库>/codex/user/technical-levels.md`
+6. 根据 `CODEX_WORK_ENV` 读取对应环境文件：
    - `CODEX_WORK_ENV=ghy`：读取 `<当前环境 dev-config-notes 仓库>/codex/envs/ghy/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/envs/ghy/experience.md`
    - `CODEX_WORK_ENV=home-windows`：读取 `<当前环境 dev-config-notes 仓库>/codex/envs/home-windows/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/envs/home-windows/experience.md`
    - `CODEX_WORK_ENV=home-wsl`：读取 `<当前环境 dev-config-notes 仓库>/codex/envs/home-wsl/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/envs/home-wsl/experience.md`
-6. 若当前工作目录位于上述某个项目根目录或其子目录，再读取该项目对应的 `<当前环境 dev-config-notes 仓库>/codex/projects/<project>/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/projects/<project>/experience.md`；只加载匹配到的一个项目。
+7. 若当前工作目录位于上述某个项目根目录或其子目录，再读取该项目对应的 `<当前环境 dev-config-notes 仓库>/codex/projects/<project>/rules.md` 与 `<当前环境 dev-config-notes 仓库>/codex/projects/<project>/experience.md`；只加载匹配到的一个项目。
 
 配置示例：`export CODEX_WORK_ENV=ghy`、`export CODEX_WORK_ENV=home-windows` 或 `export CODEX_WORK_ENV=home-wsl`。
 
