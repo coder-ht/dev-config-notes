@@ -1,10 +1,10 @@
 # Cube2 应用路由手册
 
-本文档用于帮助 AI 处理 Cube2 后台问题时快速判断应该读取哪个应用、哪个目录和哪些入口文件。适用仓库：`/home/ghy/work/cube2-upgrade`。
+本文档用于帮助 AI 处理 Cube2 后台问题时快速判断应该读取哪个应用、哪个目录和哪些入口文件。适用于 `/home/ghy/work/cube2-upgrade` 和 `/home/hetao/workspace/cube2-upgrade`。
 
 ## 使用规则
 
-1. 处理任何 Cube2 后台任务时，先读本文档。
+1. 需要定位 Cube2 应用、接口、数据或代码归属时，先读本文档；与应用路由无关的说明、规则维护或通用问答不读取。
 2. 先根据业务词、接口路径、网关前缀、表名前缀、Controller 名称判断应用目录。
 3. 命中具体应用后，优先读取该应用根目录的 `SKILL.md`。当前已有专项说明的应用：
    - `packages/apps/cold-storage/SKILL.md`

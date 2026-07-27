@@ -15,11 +15,23 @@
 - ghy 环境规则文件是 `codex/envs/ghy/rules.md`，通用规则文件是 `codex/general/rules.md`。
 - `/home/ghy/.codex` 不是 `dev-config-notes` 仓库的一部分，本机配置修改无法随仓库 git 提交。
 
-## 2026-07-09 ghy 本机规则备份范围
+## 2026-07-09 ghy 本机规则同步
 
-- 场景：用户要求把当前本机 Codex 规则备份到 `dev-config-notes` 仓库。
-- 做法：`/home/ghy/.codex/AGENTS.md` 备份到 `codex/AGENTS.md`；ghy 机器专属的规则、经验和说明类 Markdown 备份到 `codex/envs/ghy/`。
-- 注意：按用户要求决定备份范围；本机配置修改无法随仓库 git 提交时，需要单独说明。
+- 场景：用户要求在 ghy 机器同步或备份当前 Codex 规则。
+- 做法：检查 `/home/ghy/work/dev-config-notes` 的本地改动与远端最新规则，以远端为基线合并本机有效改动；完成后让 `/home/ghy/.codex/AGENTS.md` 与仓库入口一致，并提交、推送本次 `codex/` 变更。
+- 注意：`~/.codex/codex/` 旧镜像不参与同步；两边冲突时不得整体覆盖，应保留差异并请求用户判断。
+
+## 2026-07-09 Git log 时间显示
+
+- 场景：`git log` 显示时间与本机时区不一致。
+- 判断与做法：先核对系统时间、`TZ`、`git config --show-origin --get-all log.date` 和 `git log --date=iso-local`；确认只是显示格式时，可在目标仓库设置 `git config --local log.date iso-local`。
+- 边界与验证：该设置只修改仓库 `.git/config` 的显示方式，不改写历史提交；用普通 `git log` 验证本地时区显示。
+
+## 2026-07-09 GNOME Terminal 背景能力边界
+
+- 场景：需要为 GNOME Terminal 设置图片背景或恢复终端颜色。
+- 判断与做法：GNOME Terminal 当前 schema 不支持窗口背景图，桌面壁纸会被最大化终端遮挡；图片背景需求改用支持该能力的终端。颜色异常时优先恢复当前 profile 的 `use-theme-colors=true`。
+- 边界与验证：桌面背景通过 GNOME `gsettings` 管理，与终端窗口背景不同；修改后分别检查桌面显示和终端 profile，不把两者混为一项能力。
 
 ## 2026-07-09 ghy zsh Git 别名同步
 

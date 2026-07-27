@@ -1,6 +1,6 @@
 # Kaiyun OA 项目规则
 
-本文件适用于 `/home/ghy/work/kaiyun-oa` 和 `/home/hetao/workspace/kaiyun-oa`，由 `ghy`、`home` 两个 Codex 环境共同加载。
+本文件适用于 `/home/ghy/work/kaiyun-oa` 和 `/home/hetao/workspace/kaiyun-oa`，由 `ghy`、`home-windows` 和 `home-wsl` 环境共同加载。
 
 ## 项目结构
 
