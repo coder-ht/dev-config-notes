@@ -21,8 +21,8 @@
 ## 2026-07-13 测试环境服务器构建部署
 
 - 场景：Kaiyun 测试环境改为服务器本机打包 JAR 和构建 Docker 镜像。
-- 做法：服务器项目位于 `/root/docker/server/kaiyun/repo/test`，使用 JDK 21、Maven 3.8.7、Docker Compose 5；镜像按模块版本标记，部署日志放在 `/root/docker/server/kaiyun/repo/test/logs/deploy/` 且只保留最新一份。
-- 注意：固定容器名切换 Compose project 时，必须在镜像构建成功后移除旧容器再启动；服务器磁盘剩余约 10GB，部署前后应检查空间。经验中不记录服务器凭据。
+- 做法：服务器项目位于 `/root/docker/server/kaiyun/repo/test`；构建前从部署脚本和项目配置核对当前 JDK、Maven 与 Compose 要求，镜像使用可追溯的模块版本或提交标识，部署日志采用受控保留策略。
+- 注意：固定容器名切换 Compose project 时，必须在镜像构建成功后移除旧容器再启动；部署前后检查磁盘空间，但不把某次剩余空间、工具版本或日志数量写成长期经验。经验中不记录服务器凭据。
 
 ## 2026-07-14 测试环境部署与版本自动升级
 
@@ -39,12 +39,12 @@
 ## 2026-07-14 正式环境改为服务器构建部署
 
 - 场景：正式环境参考测试环境，改为服务器拉取指定 `main` SHA、本机构建前后端并通过 Compose 发布。
-- 做法：正式仓库使用 `/root/docker/server/kaiyun/repo/prod`；部署脚本可在空目录初始化 `origin`，并强制用目标 SHA 覆盖 Actions 预上传的临时脚本；正式镜像使用“模块版本-SHA”标签，保留最新 20 份日志。
-- 注意：服务器首次 `npm ci` 可能超过 SSH Action 默认 10 分钟，需显式增大 `command_timeout`；Actions 超时后远端进程可能继续持有部署锁，重新触发前先检查部署进程和锁占用。
+- 做法：正式仓库使用 `/root/docker/server/kaiyun/repo/prod`；部署脚本可在空目录初始化 `origin`，并强制用目标 SHA 覆盖 Actions 预上传的临时脚本；正式镜像使用“模块版本-SHA”标签，日志采用有上限的轮换保留策略。
+- 注意：服务器首次 `npm ci` 可能超过 SSH Action 默认超时，需根据当前构建耗时为 `command_timeout` 留出余量；Actions 超时后远端进程可能继续持有部署锁，重新触发前先检查部署进程和锁占用。
 
 ## 2026-07-14 前端服务器构建依赖缓存
 
-- 场景：前端服务器部署约 8 分钟，其中 `npm ci` 重建 631MB、4 万余文件耗时 6 分钟以上。
+- 场景：前端服务器部署的主要耗时来自依赖未变化时仍重复执行 `npm ci`。
 - 做法：按锁文件真实依赖、Node ABI、平台和架构生成环境级指纹，忽略自动版本提交只改变的根版本字段；指纹不变且 `node_modules` 完整时跳过 `npm ci`。
 - 注意：首次部署、真实依赖变化或运行环境变化仍需完整安装；`scp-action` 会保留 source 路径层级，上传部署脚本时 target 应指向仓库根目录，避免产生重复的 `deploy/test/deploy/test`。
 
@@ -130,7 +130,7 @@
 
 - 场景：在当前 Spring MVC 项目中增加 LangChain4j 流式聊天接口。
 - 做法：使用 `OpenAiStreamingChatModel` 创建 `StreamingChatModel` Bean，控制器通过 `SseEmitter` 转发 `onPartialResponse` 分片，并在完成或异常回调中结束连接。
-- 注意：接口返回类型使用 `text/event-stream`，不要把 `ChatResponse` 直接作为普通 JSON 返回；当前项目无需额外引入 WebFlux。
+- 注意：接口返回类型使用 `text/event-stream`，不要把 `ChatResponse` 直接作为普通 JSON 返回；Spring MVC 可直接使用 `SseEmitter`，无需仅为该接口引入 WebFlux。
 
 ## 2026-07-23 LangChain4j AI Services 依赖
 
@@ -138,20 +138,8 @@
 - 做法：在保留厂商适配依赖的同时，补充同版本的 `dev.langchain4j:langchain4j` 主依赖；厂商依赖负责模型客户端，高层主依赖负责 AI Services 等能力。
 - 注意：示例接口中的注解必须使用 `dev.langchain4j.service` 包，`@SystemMe` 等拼写错误会被误判为依赖缺失。
 
-## 2026-07-23 LangChain4j 通用依赖归属
-
-- 场景：业务模块需要使用 `@Tool`、AI Services 等 LangChain4j 通用能力。
-- 做法：将 `dev.langchain4j:langchain4j` 主依赖放入 `common`，将 `langchain4j-open-ai` 等具体厂商适配依赖保留在 `ai` 模块。
-- 注意：通用能力和厂商模型客户端分层，避免所有业务模块都直接依赖具体模型厂商。
-
-## 2026-07-23 LangChain4j OpenAI 兼容依赖下沉 common
-
-- 场景：其他业务模块也需要直接使用 OpenAI 兼容的 LangChain4j 客户端类。
-- 做法：在 `common` 中补充同版本的 `dev.langchain4j:langchain4j-open-ai`，与主 `langchain4j` 依赖保持版本一致。
-- 注意：该依赖会通过 `common` 传递到业务模块；若后续需要严格隔离厂商依赖，再将其移回 AI 适配模块并由业务模块显式声明。
-
 ## 2026-07-23 AI 模块依赖边界调整
 
 - 场景：AI 模块不应通过 Maven 直接依赖所有业务模块，避免依赖扩散和模块边界变宽。
-- 做法：从 `ai` 移除 system、file、message、process、settlement、expense、attendance、job、quartz、generator 等业务依赖；将 LangChain4j 主依赖和 OpenAI 兼容依赖保留在 `ai`，`common` 只保留通用业务基础依赖。
-- 注意：AI Tool 需要哪个业务能力时，再按实际使用场景显式增加对应业务模块依赖；当前依赖图验证为 `base -> common -> framework -> ai`。
+- 做法：`dev.langchain4j:langchain4j` 和 `dev.langchain4j:langchain4j-open-ai` 都由 `ai` 模块直接持有，不下沉到 `common`，也不让所有业务模块传递依赖 AI 库；`common` 只保留通用业务基础依赖。
+- 注意：AI Tool 需要哪个业务能力时，再按实际使用场景在 `ai` 中显式增加对应业务模块依赖；执行任务时重新核对当前 POM，不把某次模块图或依赖版本写成长期事实。

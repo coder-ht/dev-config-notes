@@ -36,14 +36,8 @@
 ## 2026-07-09 ghy zsh Git 别名同步
 
 - 场景：用户要求把 zsh Git 别名同步规则写入规则。
-- 做法：ghy 本机 `.zshrc` 是 `/home/ghy/.zshrc`，仓库备份文件是 `git/git-fast-options`；同步时优先让 `.zshrc` source 仓库文件，备份时先比较两边差异再更新仓库 alias。
-- 注意：当前 `.zshrc` 中 Git alias 比 `git/git-fast-options` 更多，后续真实同步/备份时需要先对齐差异，再用 `zsh -ic 'alias gfp gpp gp gpu gst'` 验证关键别名。
-
-## 2026-07-10 baseline 前端版本升级最小流程
-
-- 场景：升级 `/home/ghy/work/baseline/component/fe.yaml` 中某个前端应用的部署版本。
-- 做法：升级哪些应用必须由用户明确指定；AI 读取这些应用当前分支 `package.json` 中的实际版本，并逐一与 baseline 对应版本比较。版本一致时不修改 baseline、不提交、不推送；版本不一致时，以用户指定应用自身的实际版本为准更新 baseline。需要更新时先在 baseline 仓库执行 `git pull --ff-only`，再按 `package` 名称上下文精确修改对应 `version`，最后检查目标差异、`git diff --check` 和 YAML 解析结果。
-- 注意：AI 不得根据应用与 baseline 的版本差异自行增加、删除或调整升级应用范围，也不得自行推断其他目标版本。只要求升级 baseline 时，不顺带修改或提交应用仓库；不要按裸版本号替换，避免误改其他同版本组件。执行期间若分支或文件状态发生变化，先重新读取状态再继续。
+- 做法：ghy 本机 `/home/ghy/.zshrc` 只通过 `source /home/ghy/work/dev-config-notes/git/git-fast-options` 加载 Git 别名，仓库文件是别名的唯一维护位置。
+- 验证：检查 source 入口后，用非交互式 zsh 加载全部关键别名；`gc` 必须解析为 `git commit`，`gco` 必须解析为 `git checkout`。
 
 ## 2026-07-10 Kitty 输入光标闪烁
 
@@ -63,42 +57,13 @@
 - 做法：用临时 apt 配置读取 `https://releases.warp.dev/linux/deb stable main`，下载 `warp-terminal` 的 `.deb`，校验 Packages 中的 SHA256 后用 `dpkg-deb -x` 解包到 `/home/ghy/.local/opt/warp-terminal-debroot`，再将 `/home/ghy/.local/bin/warp-terminal` 链接到包内 `warp` 可执行文件。
 - 注意：Warp 当前共享可执行文件的 `--version` 可能显示 `Oz v...`，可用 `dump-debug-info` 验证真实 Warp 版本、Wayland 和 GPU 信息；桌面入口写入 `/home/ghy/.local/share/applications/dev.warp.Warp.desktop`，`Exec` 使用绝对路径。
 
-## 2026-07-10 ghy WezTerm tmux 风格快捷键
+## 2026-07-27 ghy WezTerm 当前终端方案
 
-- 场景：ghy 本机希望 WezTerm 的常用窗格和标签页快捷键贴近当前 tmux 日常操作。
-- 做法：新建或维护 `/home/ghy/.wezterm.lua`，只追加 `Alt` 风格键位，不配置 `Ctrl-b` leader，避免影响终端内继续使用 tmux。
-- 注意：当前 tmux 日常键位来自 `/home/ghy/.tmux.conf.local` 的 `M-h/j/k/l/o`、`M-H/J/K/L`、`M--`、`M-\`、`M-c/n/p/Tab`、`M-z/x/v`；修改后用 `wezterm --config-file /home/ghy/.wezterm.lua show-keys --lua` 验证解析和最终键位。
-- 补充：窗口标题改名快捷键使用 `Alt+Shift+R`，通过 `PromptInputLine` 获取输入并调用 `window:mux_window():set_title(line)`；避免使用容易和终端程序冲突的 `Alt+r`。
-
-## 2026-07-13 ghy WezTerm 仅承载 tmux
-
-- 场景：用户不希望 WezTerm 单独维护一套快捷键，避免与 tmux 的 root `Alt` 映射冲突。
-- 做法：在 `/home/ghy/.wezterm.lua` 清空 WezTerm 自定义键位并禁用默认键位，仅设置 `default_prog` 自动 `tmux new-session -A -s main`；窗格、窗口、会话和复制模式快捷键统一交给 tmux。
-- 注意：用 `wezterm --config-file /home/ghy/.wezterm.lua show-keys --lua` 确认主 `keys` 表为空，再用 `tmux show-options` 和 `tmux list-keys -T root` 回归 tmux 的前缀与 root 映射。
-
-## 2026-07-13 ghy 改用 WezTerm 直接承载 zsh
-
-- 场景：用户放弃 tmux，改为直接使用 WezTerm 管理窗格和标签页。
-- 做法：在 `/home/ghy/.wezterm.lua` 将 `default_prog` 改为 `/bin/zsh -l`，恢复 WezTerm 的 Alt 窗格、分屏、缩放、复制模式和标签页快捷键；不修改 tmux 配置。
-- 注意：用 `wezterm --config-file /home/ghy/.wezterm.lua show-keys --lua` 验证配置解析和关键映射。
-
-## 2026-07-10 ghy WezTerm CapsLock 快捷键入口
-
-- 场景：ghy 本机要把 WezTerm 原 Alt 风格快捷键改为 CapsLock 触发。
-- 做法：不要把 `ALT` 直接替换成不存在的 CapsLock 修饰符；在 `/home/ghy/.wezterm.lua` 中把 `CapsLock` 绑定到一次性 `ActivateKeyTable`，再在自定义 key table 中复用原来的窗格、分屏、标签页动作。
-- 注意：用 `wezterm --config-file /home/ghy/.wezterm.lua show-keys --lua` 验证，确认 `CapsLock` 入口和自定义 key table 都被当前 WezTerm 版本解析。
-
-## 2026-07-10 ghy GNOME Wayland 禁用 CapsLock 锁定
-
-- 场景：ghy 本机在 GNOME Wayland 下需要禁用 CapsLock 切换大小写。
-- 做法：使用 `gsettings set org.gnome.desktop.input-sources xkb-options "['caps:none']"`，再用 `gsettings get org.gnome.desktop.input-sources xkb-options` 验证。
-- 注意：`caps:none` 会禁用 CapsLock 键本身；如果还要让应用收到 CapsLock 作为快捷键入口，需要另行做键盘重映射而不是直接禁用。
-
-## 2026-07-10 ghy CapsLock 作为 WezTerm 入口且不锁定大小写
-
-- 场景：ghy 本机既要避免 CapsLock 切换大小写，又要让 WezTerm 继续把它当快捷键入口。
-- 做法：GNOME Wayland 使用 `gsettings set org.gnome.desktop.input-sources xkb-options "['caps:menu']"` 把 CapsLock 映射为 Menu/Application 键；WezTerm 中绑定 `key = 'Applications'` 到一次性 `ActivateKeyTable`。
-- 注意：WezTerm 配置里 `key = 'Menu'` 在当前版本未进入 `show-keys` 有效结果；应使用 `Applications`，并用 `wezterm --config-file /home/ghy/.wezterm.lua show-keys --lua` 验证。
+- 场景：维护 ghy 当前 WezTerm、tmux 和 CapsLock 的生效关系。
+- 当前方案：`/home/ghy/.wezterm.lua` 直接启动 `/bin/zsh -l`，由 WezTerm 的 `Alt` 快捷键管理窗格和标签页，并使用本地 resurrect 脚本定期保存、启动恢复 workspace。
+- 边界：WezTerm 不自动进入 tmux；`/home/ghy/.tmux.conf.local` 仅供独立启动 tmux 时使用，两套 `Alt` 快捷键不能视为同时生效。WezTerm 当前没有 CapsLock key table，GNOME 当前也没有 CapsLock 的 XKB 重映射。
+- 已废弃方案：WezTerm 自动附着 tmux、CapsLock 触发 WezTerm key table、`caps:none` 和 `caps:menu` 均不是当前配置；只有用户明确要求回滚时才从 Git 历史恢复。
+- 验证：用 `wezterm --config-file /home/ghy/.wezterm.lua show-keys --lua` 检查配置与快捷键，并用 `gsettings get org.gnome.desktop.input-sources xkb-options` 核对 CapsLock 映射。
 
 ## 2026-07-10 ghy Fcitx5 Tab 被输入法吞掉
 

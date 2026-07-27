@@ -2,6 +2,11 @@
 
 本文档记录 Debian12 WSL 专属的路径、配置和工作流经验。敏感凭据不写入经验。
 
+## 经验归属
+
+- 按任务的实际执行入口归类：由 WSL shell 或 WSL Codex 发起的任务写入本文件，即使过程中调用 Windows Chrome、PowerShell 或访问 Windows 盘符。
+- 从 Windows PowerShell 或 Windows Codex 发起的任务归入 `codex/envs/home-windows/experience.md`；不依赖执行入口的方法才考虑通用经验。
+
 ## 2026-07-16 WSL 生成 PDF 到 Windows D 盘桌面
 
 - 场景：WSL 中生成中文学习资料 PDF，并交付到 Windows 的 D 盘桌面。
