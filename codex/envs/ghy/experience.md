@@ -117,3 +117,15 @@
 - 场景：MySQL MCP 能启动并执行显式库名 SQL，但 `get_database_info` 报 `No database selected`。
 - 做法：检查对应 MCP 的 `MYSQL_DATABASE` 是否为空；需要使用库信息类工具时，在 `~/.codex/config.toml` 的对应 server env 中配置默认数据库，再用 `tomllib` 和 `codex mcp list` 验证。
 - 注意：只记录工具行为和配置边界，不把数据库主机、账号、密码或完整日志写入经验文件；修改后当前会话仍可能需要重启才加载新默认库。
+
+## 2026-07-18 ghy DM MCP 只读配置
+
+- 场景：本机通过 `dm-mcp-server` 配置 DM 数据库只读 MCP。
+- 做法：使用独立 Python 虚拟环境运行 MCP，设置 `DAMENG_READ_ONLY=true` 和 Schema 白名单；Linux 环境将该虚拟环境内的 `dmssl` 目录加入 `LD_LIBRARY_PATH`。需要全库只读时，从 `ALL_USERS` 枚举当前 Schema 并完整写入 `DAMENG_ALLOWED_SCHEMAS`。
+- 注意：当前服务不支持用 `*` 表示全库，白名单留空也只允许默认 Schema；新增 Schema 后需重新枚举，配置修改后需重启 Codex/MCP。未配置加密库路径时可能报 `-70089 加密模块加载失败`；补齐后若返回 `-2501 用户名或密码错误`，说明已到达数据库，应核对账号、密码或端口对应实例，不要继续猜测凭据。
+
+## 2026-07-21 ghy Codex 终端卡死恢复
+
+- 场景：Codex CLI 界面卡死，对应进程持续高 CPU/高写入，且同一会话重复启动多组 MCP 子进程。
+- 做法：先按 TTY 核对 Codex PID、会话 ID 和子进程树，只向异常 Codex 发送 `SIGTERM`；主进程退出后继续清理该会话遗留的 MCP 进程，再对原 TTY 执行 `stty sane`。
+- 注意：不要按名称全局 `pkill codex` 或终止包含登录 shell 的整个进程组；验证时确认原 TTY 只剩 shell，且 `icanon`、`echo` 和 `isig` 已恢复。

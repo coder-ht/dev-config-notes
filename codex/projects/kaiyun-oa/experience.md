@@ -72,6 +72,12 @@
 - 做法：先检查 `.vscode/launch.json`、`.vscode/settings.json`、本地 Maven 仓库和全局 settings；将调试工作目录对齐到 `kaiyun-be`，使用可读的工作区 Maven settings，并一次性安装缺失的内部模块后执行 `application compile -DskipTests` 验证。
 - 注意：缺少内部 JAR 和不可读的系统 Maven settings 往往是启动根因；`ENOSPC` 文件监听告警可能同时出现，但不一定是 Java classpath 根因。
 
+## 2026-07-23 Kaiyun AI 模块接入 LangChain4j
+
+- 场景：在 `kaiyun-be` Maven 多模块项目中接入 DeepSeek API 进行 LangChain4j 学习和测试。
+- 做法：新增 `ai` 模块，使用 `langchain4j-open-ai` 连接 DeepSeek 的 OpenAI 兼容接口；应用配置默认关闭，通过 `AI_DEEPSEEK_ENABLED` 和 `DEEPSEEK_API_KEY` 环境变量启用，模型和连接参数也使用环境变量覆盖；需要由 AI 直接调用业务 Service 时，在 `ai/pom.xml` 显式依赖对应业务模块，保持依赖方向为业务模块 → AI 使用方，避免反向依赖。
+- 注意：定向编译需同时指定仓库内 Maven settings 作为 global/user settings，避免系统 `/usr/share/maven/conf/settings.xml` 权限问题；应用全量定向编译若被既有 `process` 模块实体目标类不一致阻断，应区分既有构建问题与 AI 模块自身编译结果。
+
 ## 2026-06-15 隐患治理需求文档分析
 
 - 场景：分析 Kaiyun OA 的隐患治理应用需求文档。
@@ -82,7 +88,7 @@
 
 - 场景：需要以指定用户身份调用正式接口调试，但验证码登录不便重复执行。
 - 做法：从 Redis 的 `login_tokens:*` 缓存项中按缓存值里的用户信息定位会话，再取对应 token 调用接口。
-- 注意：不得记录密码、完整 token 或 Redis 脱敏以外的认证信息；Redis key 按 token 组织，不能直接用用户名拼出 key。
+- 注意：不得记录密码、完整 token 或 Redis 脱敏以外的认证信息；Redis key 按 token 组织，不能直接用用户名拼出 key；若 JWT 已能解析但 Redis 查询返回空对象，401 根因是登录缓存缺失、过期、注销或环境/数据库不一致，应重新登录并核对当前应用连接的 Redis。
 
 ## 2026-07-14 临时文件孤儿检查
 
@@ -113,3 +119,39 @@
 - 场景：流程执行记录接口注释需要提供给 Apifox 和前端对接。
 - 做法：接口注释同时说明用途、权限范围、请求字段必填性、格式、枚举值、响应字段含义、排序规则和空值行为；通过 MCP 同步时先读取现有接口定义，再按方法和路径最小范围更新。
 - 注意：更新 Apifox 请求体时必须保留原 `requestBody.jsonSchema.$ref`；只写 `requestBody.parameters` 会覆盖 Schema 引用，导致文档只显示 `object`、字段消失。字段说明应写入接口实际引用的 OpenAPI Schema，同步后重新读取接口并核对 Schema 引用、字段列表、必填项、描述及同批次其他接口，不能仅依据 MCP 的成功响应判断完成。
+
+## 2026-07-23 LangChain4j ChatResponse 接口返回
+
+- 场景：Spring 接口将 LangChain4j 的 `ChatResponse` 直接放入 `Result.data` 时，Jackson 报 `No serializer found`。
+- 做法：对外返回文本时使用 `chatResponse.aiMessage().text()`，接口泛型声明为 `Result<String>`；只有确实需要响应元数据时，才自行定义可序列化 DTO。
+- 注意：不要通过关闭 `SerializationFeature.FAIL_ON_EMPTY_BEANS` 掩盖类型设计问题；`ChatResponse` 的内容和 token 等元数据应按 API 需要显式映射。
+
+## 2026-07-23 LangChain4j 流式接口
+
+- 场景：在当前 Spring MVC 项目中增加 LangChain4j 流式聊天接口。
+- 做法：使用 `OpenAiStreamingChatModel` 创建 `StreamingChatModel` Bean，控制器通过 `SseEmitter` 转发 `onPartialResponse` 分片，并在完成或异常回调中结束连接。
+- 注意：接口返回类型使用 `text/event-stream`，不要把 `ChatResponse` 直接作为普通 JSON 返回；当前项目无需额外引入 WebFlux。
+
+## 2026-07-23 LangChain4j AI Services 依赖
+
+- 场景：当前 AI 模块只引入 `langchain4j-open-ai` 时，无法使用 `AiServices`、`@SystemMessage` 和 `@UserMessage`。
+- 做法：在保留厂商适配依赖的同时，补充同版本的 `dev.langchain4j:langchain4j` 主依赖；厂商依赖负责模型客户端，高层主依赖负责 AI Services 等能力。
+- 注意：示例接口中的注解必须使用 `dev.langchain4j.service` 包，`@SystemMe` 等拼写错误会被误判为依赖缺失。
+
+## 2026-07-23 LangChain4j 通用依赖归属
+
+- 场景：业务模块需要使用 `@Tool`、AI Services 等 LangChain4j 通用能力。
+- 做法：将 `dev.langchain4j:langchain4j` 主依赖放入 `common`，将 `langchain4j-open-ai` 等具体厂商适配依赖保留在 `ai` 模块。
+- 注意：通用能力和厂商模型客户端分层，避免所有业务模块都直接依赖具体模型厂商。
+
+## 2026-07-23 LangChain4j OpenAI 兼容依赖下沉 common
+
+- 场景：其他业务模块也需要直接使用 OpenAI 兼容的 LangChain4j 客户端类。
+- 做法：在 `common` 中补充同版本的 `dev.langchain4j:langchain4j-open-ai`，与主 `langchain4j` 依赖保持版本一致。
+- 注意：该依赖会通过 `common` 传递到业务模块；若后续需要严格隔离厂商依赖，再将其移回 AI 适配模块并由业务模块显式声明。
+
+## 2026-07-23 AI 模块依赖边界调整
+
+- 场景：AI 模块不应通过 Maven 直接依赖所有业务模块，避免依赖扩散和模块边界变宽。
+- 做法：从 `ai` 移除 system、file、message、process、settlement、expense、attendance、job、quartz、generator 等业务依赖；将 LangChain4j 主依赖和 OpenAI 兼容依赖保留在 `ai`，`common` 只保留通用业务基础依赖。
+- 注意：AI Tool 需要哪个业务能力时，再按实际使用场景显式增加对应业务模块依赖；当前依赖图验证为 `base -> common -> framework -> ai`。

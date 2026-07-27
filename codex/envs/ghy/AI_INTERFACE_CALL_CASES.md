@@ -508,3 +508,44 @@ releaseVersion
 2. `/validate` 返回 `FLOW_MULTIMODAL_INPUT_IGNORED` warning：当前语言模型不具备视觉输入能力，图片不会传入模型；不要绕过 `issues` 非空直接发布。
 3. 修改隐患识别输出字段时，提示词和后端解析契约必须同步，例如 `hazards[].hazardDescription`。
 4. 按用户要求记录日志或案例文件中的请求信息、DSL 和样例输入。
+
+## 粮仓温度趋势预警与温湿度看板验证
+
+适用场景：
+
+测试环境构造粮仓温度趋势预警后，回查预警记录并确认温湿度看板统计已同步。
+
+接口路径：
+
+```http
+GET http://192.168.0.243:40201/api/changsha-xialing/liangcang/warehouse-management/temperature-alert/records/page
+GET http://192.168.0.243:40201/api/changsha-xialing/liangcang/warehouse-management/temperature-humidity-monitoring/dashboard
+```
+
+必要请求头：
+
+```text
+Authorization: <Authorization>
+tenant: 58197260
+terminal: bimops-manage-web
+Accept: application/json
+```
+
+调用步骤：
+
+1. 调用预警记录分页接口，按 `warehouseIds`、`pageNumber`、`pageSize` 查询目标仓库。
+2. 核对记录中的 `currentAvgTemperature`、`warningThreshold`、`distanceToThreshold`、`dailyIncrease`、`consecutiveDays` 和 `status`。
+3. 调用温湿度看板接口，核对 `summary.warningWarehouseCount`、`summary.warningCount` 和 `recentTemperatureWarnings`。
+
+响应包装层路径：
+
+```text
+预警分页：total、records
+温湿度看板：summary、recentTemperatureWarnings
+```
+
+常见失败和排查：
+
+1. 当前温度超过阈值但没有记录：检查最近 N 天日均最高温是否连续、严格递增且平均日增幅达到配置值。
+2. 数据库有记录但接口报反序列化或 ID 异常：确认主键没有超过 Java `Long.MAX_VALUE`。
+3. 记录分页有值但看板没有统计：确认记录仓库属于温湿度应用设备绑定形成的仓库集合，并且记录未被软删除。
