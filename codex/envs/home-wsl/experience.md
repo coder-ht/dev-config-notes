@@ -24,3 +24,9 @@
 - 场景：WSL Debian 安装 lazygit。
 - 做法：下载 Linux x86_64 release，校验 `checksums.txt` 后安装到 `/home/hetao/.local/bin/lazygit`。
 - 注意：安装后用 `command -v lazygit` 和 `lazygit --version` 验证。
+
+## WSL 动态获取 Windows 代理地址
+
+- 场景：Windows 活动网卡 IP 会随网络切换而变化，WSL 中的 shell、npm、Git 和 APT 不能长期写死代理地址。
+- 做法：通过 Windows `ROUTE.EXE PRINT 0.0.0.0` 的活动默认路由提取接口 IP，由统一的只读辅助脚本输出代理 URL；shell 导出标准代理变量和 `npm_config_*` 变量，npm、Git 清除静态代理项；APT 使用 `Acquire::http::Proxy-Auto-Detect` 和 `Acquire::https::Proxy-Auto-Detect` 在请求时调用同一脚本。
+- 注意：辅助脚本获取失败时输出 `DIRECT`，避免生成无效 URL；除普通用户验证外，还要用 `_apt` 用户执行脚本并检查 `apt-config dump`，确认 Windows 互操作和 APT 配置均可用。代理程序仍需监听对应端口并允许 WSL 访问，地址解析成功不代表端口可达。

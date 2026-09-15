@@ -48,3 +48,9 @@
 - 场景：用户明确要求 Windows 上后续 Codex 会话无需逐条确认且不受沙箱限制。
 - 做法：只有获得该项明确授权后，才能在 `$env:USERPROFILE\.codex\config.toml` 设置 `approval_policy = "never"` 与 `sandbox_mode = "danger-full-access"`，并用 `codex.cmd --strict-config --version` 校验。
 - 注意：该组合允许自动执行未受沙箱保护的命令，不能根据普通安装、规则同步或“直接执行”等指令推断授权；变更前必须说明风险和影响范围。
+
+## Windows Microsoft Store 应用在商店服务禁用时的安装
+
+- 场景：通过 `winget` 的 `msstore` 源安装应用时返回 `0x80070422`，且 `InstallService` 或 `wuauserv` 处于禁用状态。
+- 做法：先核对 Microsoft Store 与 Desktop App Installer 包完整；若应用官网提供微软签名的 Store Installer，可验证数字签名后启动该安装器完成交互安装，再通过 `Get-AppxPackage` 和 `Get-StartApps` 回读包状态与开始菜单入口。
+- 注意：不要仅凭安装器退出码判断成功，也不要未经授权永久改变系统服务启动策略；若官方安装器仍失败，再取得管理员授权后调整服务策略。
