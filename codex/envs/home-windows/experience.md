@@ -41,7 +41,7 @@
 
 - 场景：将 Windows 的 npm 全局 Codex CLI 和用户配置迁移到 D 盘。
 - 做法：先读取当前 `codex.cmd --version`，使用 `npm install -g @openai/codex@<当前版本> --prefix <D盘目标目录>` 安装同版本，复制 `.codex` 后设置用户级 `CODEX_HOME` 和 `Path`。
-- 注意：不得输出认证文件内容；在新终端验证命令解析、版本与配置目录后，只有用户明确授权才能删除旧安装或旧配置。
+- 注意：不得输出认证文件内容；在新终端验证命令解析、版本与配置目录后，只有用户明确授权才能删除旧安装或旧配置。自定义 npm 前缀下，通用的 `npm install -g` 会写入当前默认前缀，更新前应核对 `npm config get prefix` 与 `Get-Command codex -All`；目标 Codex 正在运行时 Windows 可能因可执行文件被锁定而返回 `EBUSY`，应退出相关进程后更新，并在验证目标版本可启动后再删除旧副本。
 
 ## Windows Codex 免确认与全权限配置
 
@@ -54,3 +54,9 @@
 - 场景：通过 `winget` 的 `msstore` 源安装应用时返回 `0x80070422`，且 `InstallService` 或 `wuauserv` 处于禁用状态。
 - 做法：先核对 Microsoft Store 与 Desktop App Installer 包完整；若应用官网提供微软签名的 Store Installer，可验证数字签名后启动该安装器完成交互安装，再通过 `Get-AppxPackage` 和 `Get-StartApps` 回读包状态与开始菜单入口。
 - 注意：不要仅凭安装器退出码判断成功，也不要未经授权永久改变系统服务启动策略；若官方安装器仍失败，再取得管理员授权后调整服务策略。
+
+## WSL mirrored 模式下清理应用代理
+
+- 场景：Windows 保留系统代理，但要求 WSL 应用不再使用 HTTP/SOCKS 代理。
+- 做法：同时检查 Windows `.wslconfig` 的 `autoProxy`、WSL Shell 启动文件、APT 自动检测脚本、包管理器、Git、Docker/systemd 和 IDE 自动代理设置；先备份，再移除实际启用代理的配置。设置 `autoProxy=false` 后需重启 WSL，并在默认进程和新 Shell 中验证代理环境变量及工具有效配置。
+- 注意：mirrored 网络模式不等于应用流量已由 Windows 代理接管；旧进程仍保留原环境，存在编辑器或终端时先确认已保存再重启。不要删除系统 SSH 的 Unix socket/vsock 转发、注释示例、反向代理业务配置或历史备份。HTTP 401 仅证明接口网络可达，不代表认证和模型请求成功。

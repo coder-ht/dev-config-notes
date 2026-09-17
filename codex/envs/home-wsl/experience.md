@@ -30,3 +30,9 @@
 - 场景：Windows 活动网卡 IP 会随网络切换而变化，WSL 中的 shell、npm、Git 和 APT 不能长期写死代理地址。
 - 做法：通过 Windows `ROUTE.EXE PRINT 0.0.0.0` 的活动默认路由提取接口 IP，由统一的只读辅助脚本输出代理 URL；shell 导出标准代理变量和 `npm_config_*` 变量，npm、Git 清除静态代理项；APT 使用 `Acquire::http::Proxy-Auto-Detect` 和 `Acquire::https::Proxy-Auto-Detect` 在请求时调用同一脚本。
 - 注意：辅助脚本获取失败时输出 `DIRECT`，避免生成无效 URL；除普通用户验证外，还要用 `_apt` 用户执行脚本并检查 `apt-config dump`，确认 Windows 互操作和 APT 配置均可用。代理程序仍需监听对应端口并允许 WSL 访问，地址解析成功不代表端口可达。
+
+## WSL 安装 Windows Wireshark
+
+- 场景：从 WSL 为 Windows 桌面安装 Wireshark；先明确抓包目标是 Windows 还是 WSL。
+- 做法：可调用 Windows winget；下载停滞时可从 Wireshark 官网下载安装包，校验 winget 清单中的 SHA256 和 Windows Authenticode 签名后安装，避免同时运行多个安装器。
+- 注意：Wireshark 静默安装不包含 Npcap 安装，缺少驱动时需另行打开官方 Npcap 安装向导。完成后用 Windows 侧 `tshark --version`、`dumpcap -D` 和 Npcap 服务状态验证版本、驱动加载及网卡识别，不能仅凭安装器退出码判断可抓包。
