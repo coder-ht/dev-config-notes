@@ -1,0 +1,4 @@
+interface:
+  display_name: "开河工作流管理"
+  short_description: "管理 /flows 中的AI工作流、组件、会话与执行"
+  default_prompt: "Use $kaihe-flow-management to safely manage a Kaihe AI Flow."

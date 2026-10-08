@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cube2 字典管理"
+  short_description: "安全管理租户字典、数据字典与AI Flow配置"
+  default_prompt: "Use $cube2-dictionary-management to safely manage a Cube2 tenant dictionary configuration."

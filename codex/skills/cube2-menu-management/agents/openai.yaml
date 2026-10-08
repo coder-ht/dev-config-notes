@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cube2 菜单管理"
+  short_description: "安全管理 Cube2 OUAA 菜单的查询、新增、修改和删除"
+  default_prompt: "Use $cube2-menu-management to safely manage a Cube2 application menu."
